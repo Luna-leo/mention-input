@@ -24,6 +24,7 @@ export default function MentionInput() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const mentionStartIndex = useRef(-1)
   const isDeletingRef = useRef(false)
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
   // Filter users based on what's typed after @
   const filteredUsers = users.filter(
@@ -31,6 +32,13 @@ export default function MentionInput() {
       user.name.toLowerCase().includes(mentionFilter.toLowerCase()) ||
       user.username.toLowerCase().includes(mentionFilter.toLowerCase()),
   )
+
+  // Reset selection when the dropdown opens or the filter changes
+  useEffect(() => {
+    if (showMentions) {
+      setSelectedIndex(0)
+    }
+  }, [showMentions, mentionFilter])
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -157,6 +165,31 @@ export default function MentionInput() {
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={(e) => {
+          if (showMentions) {
+            if (e.key === "ArrowDown") {
+              e.preventDefault()
+              setSelectedIndex((selectedIndex + 1) % filteredUsers.length)
+              return
+            }
+            if (e.key === "ArrowUp") {
+              e.preventDefault()
+              setSelectedIndex(
+                (selectedIndex - 1 + filteredUsers.length) % filteredUsers.length,
+              )
+              return
+            }
+            if (e.key === "Enter") {
+              e.preventDefault()
+              const user = filteredUsers[selectedIndex]
+              if (user) handleSelectUser(user)
+              return
+            }
+            if (e.key === "Escape") {
+              e.preventDefault()
+              setShowMentions(false)
+              return
+            }
+          }
           if (e.key === "Backspace" || e.key === "Delete") {
             isDeletingRef.current = true
           } else {
@@ -183,11 +216,13 @@ export default function MentionInput() {
             <CommandList>
               <CommandEmpty>ユーザーが見つかりません</CommandEmpty>
               <CommandGroup heading="ユーザー">
-                {filteredUsers.map((user) => (
+                {filteredUsers.map((user, index) => (
                   <CommandItem
                     key={user.id}
                     onSelect={() => handleSelectUser(user)}
                     className="flex items-center gap-2 p-2"
+                    data-selected={index === selectedIndex}
+                    onMouseEnter={() => setSelectedIndex(index)}
                   >
                     <div>
                       <p className="text-sm font-medium">{user.name}</p>
