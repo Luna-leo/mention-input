@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import {
   Command,
@@ -28,7 +28,17 @@ export default function FormulaInput() {
   const [showOps, setShowOps] = useState(false)
   const [showItems, setShowItems] = useState(false)
   const [cursorPos, setCursorPos] = useState(0)
+  const [opIndex, setOpIndex] = useState(0)
+  const [itemIndex, setItemIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (showOps) setOpIndex(0)
+  }, [showOps])
+
+  useEffect(() => {
+    if (showItems) setItemIndex(0)
+  }, [showItems])
 
   const handleSelect = (op: string) => {
     const before = formula.slice(0, cursorPos)
@@ -100,6 +110,40 @@ export default function FormulaInput() {
           setCursorPos(newCursor)
         }}
         onKeyDown={(e) => {
+          if (showOps || showItems) {
+            if (e.key === "ArrowDown") {
+              e.preventDefault()
+              if (showOps) {
+                setOpIndex((opIndex + 1) % operators.length)
+              } else {
+                setItemIndex((itemIndex + 1) % items.length)
+              }
+              return
+            }
+            if (e.key === "ArrowUp") {
+              e.preventDefault()
+              if (showOps) {
+                setOpIndex((opIndex - 1 + operators.length) % operators.length)
+              } else {
+                setItemIndex((itemIndex - 1 + items.length) % items.length)
+              }
+              return
+            }
+            if (e.key === "Enter") {
+              e.preventDefault()
+              if (showOps) {
+                handleSelect(operators[opIndex].symbol)
+              } else {
+                handleSelectItem(items[itemIndex].value)
+              }
+              return
+            }
+            if (e.key === "Escape") {
+              setShowOps(false)
+              setShowItems(false)
+              return
+            }
+          }
           if (e.key === "#") {
             e.preventDefault()
             setCursorPos(e.currentTarget.selectionStart || 0)
@@ -119,11 +163,12 @@ export default function FormulaInput() {
           <Command>
             <CommandList>
               <CommandGroup heading="演算子">
-                {operators.map((op) => (
+                {operators.map((op, index) => (
                   <CommandItem
                     key={op.symbol}
                     onSelect={() => handleSelect(op.symbol)}
                     className="cursor-pointer"
+                    data-selected={index === opIndex}
                   >
                     {op.label}
                   </CommandItem>
@@ -138,11 +183,12 @@ export default function FormulaInput() {
           <Command>
             <CommandList>
               <CommandGroup heading="項目">
-                {items.map((item) => (
+                {items.map((item, index) => (
                   <CommandItem
                     key={item.value}
                     onSelect={() => handleSelectItem(item.value)}
                     className="cursor-pointer"
+                    data-selected={index === itemIndex}
                   >
                     {item.label}
                   </CommandItem>
