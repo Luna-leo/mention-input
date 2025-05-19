@@ -24,6 +24,7 @@ const items = [
 
 export default function FormulaInput() {
   const [formula, setFormula] = useState("")
+  const [prevFormula, setPrevFormula] = useState("")
   const [showOps, setShowOps] = useState(false)
   const [showItems, setShowItems] = useState(false)
   const [cursorPos, setCursorPos] = useState(0)
@@ -34,6 +35,7 @@ export default function FormulaInput() {
     const after = formula.slice(cursorPos)
     const newValue = `${before}${op}${after}`
     setFormula(newValue)
+    setPrevFormula(newValue)
     setShowOps(false)
 
     const newCursor = before.length + op.length
@@ -51,6 +53,7 @@ export default function FormulaInput() {
     const after = formula.slice(cursorPos)
     const newValue = `${before}${val}${after}`
     setFormula(newValue)
+    setPrevFormula(newValue)
     setShowItems(false)
 
     const newCursor = before.length + val.length
@@ -68,7 +71,34 @@ export default function FormulaInput() {
       <Input
         ref={inputRef}
         value={formula}
-        onChange={(e) => setFormula(e.target.value)}
+        onChange={(e) => {
+          const newValue = e.target.value
+          const newCursor = e.currentTarget.selectionStart || 0
+
+          if (newValue.length - prevFormula.length === 1) {
+            const inserted = newValue[newCursor - 1]
+            if (inserted === "#" || inserted === "@") {
+              const before = newValue.slice(0, newCursor - 1)
+              const after = newValue.slice(newCursor)
+              const cleaned = `${before}${after}`
+              setFormula(cleaned)
+              setPrevFormula(cleaned)
+              setCursorPos(newCursor - 1)
+              if (inserted === "#") {
+                setShowOps(true)
+                setShowItems(false)
+              } else {
+                setShowItems(true)
+                setShowOps(false)
+              }
+              return
+            }
+          }
+
+          setFormula(newValue)
+          setPrevFormula(newValue)
+          setCursorPos(newCursor)
+        }}
         onKeyDown={(e) => {
           if (e.key === "#") {
             e.preventDefault()
