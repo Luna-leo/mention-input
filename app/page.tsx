@@ -1,4 +1,5 @@
 import MentionInput from "@/components/mention-input"
+import FormulaInput from "@/components/formula-input"
 
 export default function Home() {
   return (
@@ -7,6 +8,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold text-center">メンション機能付きコメント入力</h1>
         <p className="text-center text-muted-foreground">「@」を入力するとユーザー一覧が表示されます</p>
         <MentionInput />
+        <FormulaInput />
       </div>
     </main>
   )
