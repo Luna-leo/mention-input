@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 // Sample user data - in a real app, this would come from your API or database
 const users = [
-  { id: 1, name: "田中太郎", username: "tanaka" },
+  { id: 1, name: "エンジン 回転数", username: "engine speed" },
   { id: 2, name: "佐藤花子", username: "sato" },
   { id: 3, name: "鈴木一郎", username: "suzuki" },
   { id: 4, name: "高橋次郎", username: "takahashi" },
