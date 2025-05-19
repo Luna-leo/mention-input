@@ -98,17 +98,21 @@ export default function MentionInput() {
     const afterMention = inputValue.substring(cursorPosition)
 
     // Insert the mention
-    const newValue = `${beforeMention}@${user.username} ${afterMention}`
+    const insertion = `@${user.username} `
+    const newValue = `${beforeMention}${insertion}${afterMention}`
     setInputValue(newValue)
+
+    // Calculate new cursor position before resetting the mention index
+    const newCursorPos = beforeMention.length + insertion.length
 
     // Reset mention state
     setShowMentions(false)
     mentionStartIndex.current = -1
+    setMentionFilter("")
 
     // Focus back on textarea and set cursor position after the inserted mention
     if (textareaRef.current) {
       textareaRef.current.focus()
-      const newCursorPos = mentionStartIndex.current + user.username.length + 2 // +2 for @ and space
       setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.selectionStart = newCursorPos
