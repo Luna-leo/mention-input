@@ -23,6 +23,7 @@ export default function MentionInput() {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const mentionStartIndex = useRef(-1)
+  const isDeletingRef = useRef(false)
 
   // Filter users based on what's typed after @
   const filteredUsers = users.filter(
@@ -37,6 +38,14 @@ export default function MentionInput() {
     const cursorPos = e.target.selectionStart || 0
     setCursorPosition(cursorPos)
     setInputValue(value)
+
+    if (isDeletingRef.current) {
+      // When deleting text, avoid triggering the mention dropdown
+      mentionStartIndex.current = -1
+      setShowMentions(false)
+      isDeletingRef.current = false
+      return
+    }
 
     // Check if we're in a potential mention context
     const textBeforeCursor = value.substring(0, cursorPos)
@@ -147,6 +156,13 @@ export default function MentionInput() {
         ref={textareaRef}
         value={inputValue}
         onChange={handleInputChange}
+        onKeyDown={(e) => {
+          if (e.key === "Backspace" || e.key === "Delete") {
+            isDeletingRef.current = true
+          } else {
+            isDeletingRef.current = false
+          }
+        }}
         placeholder="コメントを入力してください（@で人をメンションできます）"
         className="min-h-[100px] resize-none"
         onClick={(e) => e.stopPropagation()}
