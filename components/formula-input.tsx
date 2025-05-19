@@ -74,5 +74,6 @@ export default function FormulaInput() {
         </div>
       )}
     </div>
+
   )
 }
