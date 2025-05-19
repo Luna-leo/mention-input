@@ -1,5 +1,6 @@
 import MentionInput from "@/components/mention-input"
 import FormulaInput from "@/components/formula-input"
+import FormulaEditor from "@/components/formula-editor"
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
         <p className="text-center text-muted-foreground">「@」を入力するとユーザー一覧が表示されます</p>
         <MentionInput />
         <FormulaInput />
+        <FormulaEditor />
       </div>
     </main>
   )
