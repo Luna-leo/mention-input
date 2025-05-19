@@ -41,16 +41,23 @@ export default function MentionInput() {
     // Check if we're in a potential mention context
     const textBeforeCursor = value.substring(0, cursorPos)
     const atSignIndex = textBeforeCursor.lastIndexOf("@")
+    const afterAt = textBeforeCursor.substring(atSignIndex + 1)
 
-    if (atSignIndex !== -1 && (atSignIndex === 0 || /\s/.test(textBeforeCursor[atSignIndex - 1]))) {
+    if (
+      atSignIndex !== -1 &&
+      (atSignIndex === 0 || /\s/.test(textBeforeCursor[atSignIndex - 1])) &&
+      !/[\s@]/.test(afterAt)
+    ) {
       // We found an @ sign that's either at the start or preceded by whitespace
+      // and there are no spaces after it before the cursor
       mentionStartIndex.current = atSignIndex
-      setMentionFilter(textBeforeCursor.substring(atSignIndex + 1))
+      setMentionFilter(afterAt)
       setShowMentions(true)
 
       // Calculate dropdown position
       calculateDropdownPosition(atSignIndex)
     } else {
+      mentionStartIndex.current = -1
       setShowMentions(false)
     }
   }
